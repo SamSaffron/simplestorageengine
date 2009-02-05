@@ -7,7 +7,8 @@ namespace SimpleStorageEngine.Persistance {
         
         void Close();
 
-        ITransaction BeginTransaction(); 
+        ITransaction BeginTransaction();
+        bool InTransaction { get; }
 
         void CreateTable(string name, TableDefinition def);
         void DropTable(string name);

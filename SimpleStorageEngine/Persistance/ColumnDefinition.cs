@@ -6,9 +6,9 @@ namespace SimpleStorageEngine.Persistance {
     public class ColumnDefinition {
 
         public ColumnDefinition(string columnName, Type type, bool isPrimaryKey) {
-            Name = columnName;
+            this.Name = columnName;
             this.Type = type; 
-            IsPrimaryKey = IsPrimaryKey;
+            this.IsPrimaryKey = isPrimaryKey;
         }
 
         public bool IsPrimaryKey { get; set; }

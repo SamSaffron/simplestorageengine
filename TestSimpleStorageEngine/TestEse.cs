@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SimpleStorageEngine.Persistance.ExtensibleStorageEngine;
 using SimpleStorageEngine.Persistance;
+using System.IO;
 
 namespace TestSimpleStorageEngine {
     /// <summary>
@@ -42,33 +43,49 @@ namespace TestSimpleStorageEngine {
         // public static void MyClassCleanup() { }
         //
 
-        EseConnection connection; 
+        static string directory = "test_data";
+        static string filename = Path.GetFullPath(directory + "\\test.edb");
+        
         [TestInitialize()]
         public void MyTestInitialize() 
         {
-            EseConnection.CreateDatabase("testdb");
-            connection = EseConnection.Open("testdb");
+            Directory.CreateDirectory(directory);
+            EseConnection.CreateDatabase(filename);
+            
         }
         
         [TestCleanup()]
         public void MyTestCleanup() 
         {
-            connection.Close(); 
+            Directory.Delete(directory, true);
         }
         
         #endregion
 
+        private EseConnection GetConnection() { 
+           return EseConnection.Open(filename); 
+        }
+
         [TestMethod]
         public void TestTableCreation() 
         {
-            connection.CreateTable("person", new TableDefinition()
-                .AddColumn("ssn", typeof(int), true)
-                .AddColumn("name", typeof(string))
-                );
+            using (var connection = GetConnection()) {
+                connection.CreateTable("person", new TableDefinition()
+                    .AddColumn("ssn", typeof(int), true)
+                    .AddColumn("name", typeof(string))
+                    );
+            }
 
-
-            Table table = connection.GetTable("person");
-            Assert.AreEqual(2, table.Columns);
+            using (var connection = GetConnection()) {
+                Table table = connection.GetTable("person");
+                var columns = table.Columns;
+                columns.Sort((x,y) => x.Name.CompareTo(y.Name)); 
+                Assert.AreEqual(2, columns.Count);
+                Assert.AreEqual("name", table.Columns[0].Name);
+                Assert.AreEqual(false, table.Columns[0].IsPrimaryKey); 
+                Assert.AreEqual("ssn", table.Columns[1].Name);
+                Assert.AreEqual(true, table.Columns[1].IsPrimaryKey); 
+            }
 
         }
 

@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using System.Text;
 
 namespace SimpleStorageEngine.Persistance {
-     public abstract class Table {
+     // Should this be ITable ? 
+     public abstract class Table : IDisposable {
         public abstract void Insert(Row o);
         public abstract Row Get(object key);
         public abstract bool Exists(object key); 
@@ -14,5 +15,11 @@ namespace SimpleStorageEngine.Persistance {
         public abstract List<ColumnDefinition> Columns { get;}
 
         //IEnumerable<TObject> Find(SearchCriteria criteria); 
-    }
+
+        #region IDisposable Members
+
+        public abstract void Dispose();
+
+        #endregion
+     }
 }

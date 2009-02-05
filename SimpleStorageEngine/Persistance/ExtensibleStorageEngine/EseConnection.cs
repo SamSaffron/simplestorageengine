@@ -6,10 +6,10 @@ using Microsoft.Isam.Esent.Interop;
 namespace SimpleStorageEngine.Persistance.ExtensibleStorageEngine {
     public class EseConnection : IConnection {
 
-        Instance instance;
-        Session session; 
+        internal Instance instance;
+        internal Session session; 
         string filename;
-        JET_DBID dbid;
+        internal JET_DBID dbid;
         bool disposed = false;
         
 
@@ -82,7 +82,20 @@ namespace SimpleStorageEngine.Persistance.ExtensibleStorageEngine {
             throw new NotImplementedException();
         }
 
+        public bool InTransaction {
+            get { throw new NotImplementedException(); }
+        }
+
         public void CreateTable(string name, TableDefinition def) {
+
+            // TODO move implementation into EseTable? 
+
+            if (def.ColumnDefinitions.FindAll(x => x.IsPrimaryKey).Count != 1) 
+            {
+                // TODO do we allow 0 primary keys? 
+                throw new EseException("Ensure one primary key is defined for the table"); 
+            }
+
             using (var transaction = new Transaction(session)) 
             {
                 JET_TABLEID tableid; 
@@ -95,6 +108,11 @@ namespace SimpleStorageEngine.Persistance.ExtensibleStorageEngine {
 
                     column_def.coltyp = JET_coltyp.LongBinary;
                     Api.JetAddColumn(session, tableid, column.Name, column_def, null, 0, out column_id); 
+                    if (column.IsPrimaryKey) 
+                    {
+                        var indexDef = "+" + column.Name + "\0\0";
+                        Api.JetCreateIndex(session, tableid, "primary", CreateIndexGrbit.IndexPrimary, indexDef, indexDef.Length, 100); 
+                    }
                 }
 
                 transaction.Commit(CommitTransactionGrbit.LazyFlush); 
@@ -106,7 +124,7 @@ namespace SimpleStorageEngine.Persistance.ExtensibleStorageEngine {
         }
 
         public Table GetTable(string name) {
-            throw new NotImplementedException();
+            return new EseTable(this, name); 
         }
 
         #endregion

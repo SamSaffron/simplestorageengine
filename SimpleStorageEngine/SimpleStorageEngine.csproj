@@ -44,6 +44,8 @@
     <Compile Include="Persistance\ActiveRecord.cs" />
     <Compile Include="Persistance\ColumnDefinition.cs" />
     <Compile Include="Persistance\ExtensibleStorageEngine\EseConnection.cs" />
+    <Compile Include="Persistance\ExtensibleStorageEngine\EseException.cs" />
+    <Compile Include="Persistance\ExtensibleStorageEngine\EseTable.cs" />
     <Compile Include="Persistance\IConnection.cs" />
     <Compile Include="Persistance\Index.cs" />
     <Compile Include="Persistance\IndexDefinition.cs" />
