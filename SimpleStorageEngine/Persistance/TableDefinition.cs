@@ -5,8 +5,14 @@ using System.Text;
 namespace SimpleStorageEngine.Persistance {
     public class TableDefinition {
 
-        List<ColumnDefinition> columnDefinitions = new List<ColumnDefinition>();
-        List<string[]> indexes;
+        
+        public TableDefinition() {
+            ColumnDefinitions = new List<ColumnDefinition>();
+            Indexes = new List<IndexDefinition>();
+        }
+
+        public List<ColumnDefinition> ColumnDefinitions { get; private set; }
+        public List<IndexDefinition> Indexes { get; private set; }
 
         public TableDefinition AddColumn(string columnName, Type type) 
         {
@@ -21,13 +27,15 @@ namespace SimpleStorageEngine.Persistance {
 
         public TableDefinition AddColumn(ColumnDefinition columnDefinition) 
         {
-            columnDefinitions.Add(columnDefinition);
+            ColumnDefinitions.Add(columnDefinition);
             return this; 
         }
 
         public TableDefinition AddIndex(params string[] columns) 
         {
-            indexes.Add(columns);
+            var def = new IndexDefinition();
+            def.AddRange(columns); 
+            Indexes.Add(def);
             return this;
         }
     }

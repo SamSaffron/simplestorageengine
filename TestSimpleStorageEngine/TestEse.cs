@@ -71,5 +71,11 @@ namespace TestSimpleStorageEngine {
             Assert.AreEqual(2, table.Columns);
 
         }
+
+        [TestMethod]
+        public void TestDataLookup() 
+        {
+ 
+        }
     }
 }
