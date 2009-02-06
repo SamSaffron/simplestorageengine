@@ -66,15 +66,12 @@ namespace TestSimpleStorageEngine {
            return EseConnection.Open(filename); 
         }
 
+
+
         [TestMethod]
         public void TestTableCreation() 
         {
-            using (var connection = GetConnection()) {
-                connection.CreateTable("person", new TableDefinition()
-                    .AddColumn("ssn", typeof(int), true)
-                    .AddColumn("name", typeof(string))
-                    );
-            }
+            CreatePersonTable();
 
             using (var connection = GetConnection()) {
                 Table table = connection.GetTable("person");
@@ -89,10 +86,38 @@ namespace TestSimpleStorageEngine {
 
         }
 
+        private void CreatePersonTable() {
+            using (var connection = GetConnection()) {
+                connection.CreateTable("person", new TableDefinition()
+                    .AddColumn("ssn", typeof(int), true)
+                    .AddColumn("name", typeof(string))
+                    );
+            }
+        }
+
         [TestMethod]
         public void TestDataLookup() 
         {
- 
+            CreatePersonTable();
+
+            using (var connection = GetConnection()) 
+            {
+                var t = connection.GetTable("person");
+                var row = new Row();
+                row["ssn"] = 1000;
+                row["name"] = "Booboo";
+                t.Insert(row); 
+            }
+
+            using (var connection = GetConnection()) {
+                var t = connection.GetTable("person");
+                var row = t.Get(1000);
+                Assert.AreEqual(row["ssn"], 1000);
+                Assert.AreEqual(row["name"], "Booboo"); 
+            }
         }
+
+        public void TestDataDeletion() 
+        { }
     }
 }
