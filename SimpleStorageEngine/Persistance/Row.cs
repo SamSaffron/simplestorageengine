@@ -15,7 +15,7 @@ namespace SimpleStorageEngine.Persistance {
             }
             set 
             {
-                data[columnName] = this;
+                data[columnName] = value;
             }
         }
     }

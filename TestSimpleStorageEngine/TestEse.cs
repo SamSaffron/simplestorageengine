@@ -117,7 +117,28 @@ namespace TestSimpleStorageEngine {
             }
         }
 
+        [TestMethod] 
         public void TestDataDeletion() 
-        { }
+        {
+            CreatePersonTable();
+            using (var connection = GetConnection()) 
+            {
+                var t = connection.GetTable("person");
+                var row = new Row();
+                row["ssn"] = 1000;
+                row["name"] = "Booboo";
+                t.Insert(row); 
+            }
+
+            using (var connection = GetConnection()) 
+            {
+                var t = connection.GetTable("person");
+                Assert.AreEqual(true, t.Exists(1000)); 
+                t.Delete(1000);
+                Assert.AreEqual(false, t.Exists(1000)); 
+            }
+        }
+
+
     }
 }

@@ -46,6 +46,7 @@
     <Compile Include="Persistance\ExtensibleStorageEngine\EseConnection.cs" />
     <Compile Include="Persistance\ExtensibleStorageEngine\EseException.cs" />
     <Compile Include="Persistance\ExtensibleStorageEngine\EseTable.cs" />
+    <Compile Include="Persistance\ExtensibleStorageEngine\EseTableCreator.cs" />
     <Compile Include="Persistance\IConnection.cs" />
     <Compile Include="Persistance\Index.cs" />
     <Compile Include="Persistance\IndexDefinition.cs" />
@@ -56,6 +57,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Persistance\Exceptions\" />
     <Folder Include="Persistance\Sqlce\" />
     <Folder Include="Persistance\Sqlite\" />
     <Folder Include="Persistance\Standalone\" />

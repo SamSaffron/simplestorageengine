@@ -7,7 +7,9 @@ namespace SimpleStorageEngine.Persistance.ExtensibleStorageEngine {
     public class EseConnection : IConnection {
 
         internal Instance instance;
-        internal Session session; 
+        internal Session session;
+        internal EseTableCreator tableCreator;
+
         string filename;
         internal JET_DBID dbid;
         bool disposed = false;
@@ -17,6 +19,7 @@ namespace SimpleStorageEngine.Persistance.ExtensibleStorageEngine {
 
         private EseConnection (string filename) {
             this.filename = filename;
+            tableCreator = new EseTableCreator(this); 
         }
 
 
@@ -87,36 +90,7 @@ namespace SimpleStorageEngine.Persistance.ExtensibleStorageEngine {
         }
 
         public void CreateTable(string name, TableDefinition def) {
-
-            // TODO move implementation into EseTable? 
-
-            if (def.ColumnDefinitions.FindAll(x => x.IsPrimaryKey).Count != 1) 
-            {
-                // TODO do we allow 0 primary keys? 
-                throw new EseException("Ensure one primary key is defined for the table"); 
-            }
-
-            using (var transaction = new Transaction(session)) 
-            {
-                JET_TABLEID tableid; 
-                Api.JetCreateTable(session, dbid, name, 16, 100, out tableid);
-
-                foreach (var column in def.ColumnDefinitions) {
-
-                    JET_COLUMNDEF column_def = new JET_COLUMNDEF(); 
-                    JET_COLUMNID column_id;
-
-                    column_def.coltyp = JET_coltyp.LongBinary;
-                    Api.JetAddColumn(session, tableid, column.Name, column_def, null, 0, out column_id); 
-                    if (column.IsPrimaryKey) 
-                    {
-                        var indexDef = "+" + column.Name + "\0\0";
-                        Api.JetCreateIndex(session, tableid, "primary", CreateIndexGrbit.IndexPrimary, indexDef, indexDef.Length, 100); 
-                    }
-                }
-
-                transaction.Commit(CommitTransactionGrbit.LazyFlush); 
-            }
+            tableCreator.Create(name, def);
         }
 
         public void DropTable(string name) {
