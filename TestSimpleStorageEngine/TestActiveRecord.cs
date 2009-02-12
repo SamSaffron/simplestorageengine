@@ -38,6 +38,20 @@ namespace TestSimpleStorageEngine {
         public string Comments { get; set; }
     }
 
+    [TableName("person")]
+    public class Person : ActiveRecord<Person> {
+
+        public string Name { get; set; }
+    }
+
+    [TableName("person")]
+    public class Person2 : ActiveRecord<Person2> {
+
+        public string Name { get; set; }
+        public string LastName { get; set; }
+    }
+
+
     [TestFixture]
     public class TestActiveRecord {
 
@@ -66,20 +80,55 @@ namespace TestSimpleStorageEngine {
         static ConnectionManager connectionManager;
 
 
-        [TestFixtureSetUp]
-        public static void MyClassInitialize() {
-            connectionManager = new EseConnectionManager("c:\\temp\\db");
+        [SetUp]
+        public void TestInitialize() {
+            Directory.CreateDirectory(directory);
+
+            connectionManager = new EseConnectionManager(filename);
+            connectionManager.CreateDatabase();
             ActiveRecordSettings.ConnectionManager = connectionManager;
+        }
+
+        [TearDown]
+        public void TestCleanup() {
+            Directory.Delete(directory, true);
         }
 
         
         #endregion
 
         [Test]
-        public void TestMethod1() {
-            //
-            // TODO: Add test logic	here
-            //
+        public void TestSimpleFunctionality() {
+            Person.Migrate();
+            var p = Person.Build();
+            p.Name = "hello";
+            p.Id = 1;
+            p.Save();
+            p = Person.Find(p.Id);
+            Assert.AreEqual("hello", p.Name);
+        }
+
+        [Test]
+        public void TestSimpleMigration() {
+            Person.Migrate();
+            
+            var p = Person.Build();
+            p.Name = "Sam";
+            p.Save();
+            int id = p.Id; 
+            
+            Person2.Migrate();
+            
+            var p2 = Person2.Find(id);
+            
+            Assert.AreEqual("Sam", p2.Name);
+            
+            p2.LastName = "Bob";
+            p2.Save();
+            p2 = Person2.Find(p2.Id);
+
+            Assert.AreEqual(p2.LastName, "Bob"); 
+
         }
     }
 }

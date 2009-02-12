@@ -40,7 +40,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ActiveRecord\Exceptions\ActiveRecordException.cs" />
     <Compile Include="ActiveRecord\Attributes\TableNameAttribute.cs" />
+    <Compile Include="ActiveRecord\RowSerializer.cs" />
     <Compile Include="Collections\Generic\PersistantDictionary.cs" />
     <Compile Include="ActiveRecord\ActiveRecord.cs" />
     <Compile Include="ActiveRecord\ActiveRecordSettings.cs" />

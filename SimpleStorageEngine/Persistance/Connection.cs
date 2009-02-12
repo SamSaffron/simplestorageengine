@@ -17,7 +17,8 @@ namespace SimpleStorageEngine.Persistance {
         public abstract ITransaction BeginTransaction();
         public abstract bool InTransaction { get; }
 
-        public abstract void CreateTable(string name, TableDefinition def);
+        public abstract bool TableExists(string name); 
+        public abstract void CreateTable(TableDefinition def);
         public abstract void DropTable(string name);
         public abstract Table GetTable(string name);
 

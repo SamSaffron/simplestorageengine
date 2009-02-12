@@ -35,7 +35,7 @@ namespace SimpleStorageEngine.Persistance.ExtensibleStorageEngine {
             this.connection = connection;
         }
 
-        public void Create(string name, TableDefinition def) 
+        public void Create(TableDefinition def) 
         { 
             if (def.ColumnDefinitions.FindAll(x => x.IsPrimaryKey).Count != 1) 
             {
@@ -46,7 +46,7 @@ namespace SimpleStorageEngine.Persistance.ExtensibleStorageEngine {
             using (var transaction = new Transaction(connection.session)) 
             {
                 JET_TABLEID tableid; 
-                Api.JetCreateTable(connection.session, connection.dbid, name, 16, 100, out tableid);
+                Api.JetCreateTable(connection.session, connection.dbid, def.TableName, 16, 100, out tableid);
 
                 foreach (var column in def.ColumnDefinitions) {
 

@@ -6,10 +6,13 @@ namespace SimpleStorageEngine.Persistance {
     public class TableDefinition {
 
         
-        public TableDefinition() {
+        public TableDefinition(string tableName) {
+            TableName = tableName;
             ColumnDefinitions = new List<ColumnDefinition>();
             Indexes = new List<IndexDefinition>();
         }
+
+        public string TableName { get; set; }
 
         public List<ColumnDefinition> ColumnDefinitions { get; private set; }
         public List<IndexDefinition> Indexes { get; private set; }

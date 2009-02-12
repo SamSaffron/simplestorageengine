@@ -8,7 +8,7 @@ namespace SimpleStorageEngine.Persistance {
         
         private const string ConnectionSlot = "SimpleStorageConnection";
 
-        Connection GetConnection() {
+        public Connection GetConnection() {
             Connection connection = CallContext.GetData(ConnectionSlot) as Connection;
             if (connection == null)
             {

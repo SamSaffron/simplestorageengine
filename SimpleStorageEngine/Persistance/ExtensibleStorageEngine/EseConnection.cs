@@ -12,50 +12,17 @@ namespace SimpleStorageEngine.Persistance.ExtensibleStorageEngine {
 
         string filename;
         internal JET_DBID dbid;
-        bool disposed = false;
         
 
         #region IConnection Members
 
-        private EseConnection (string filename) {
+        internal EseConnection (string filename) {
             this.filename = filename;
             tableCreator = new EseTableCreator(this); 
         }
 
 
-        public static void CreateDatabase(string filename) 
-        {
-            try {
-                using (Instance instance = new Instance("newdb")) {
-                    instance.Init();
-                    using (Session session = new Session(instance)) {
-                        JET_DBID dbid;
-                        Api.JetCreateDatabase(session, filename, null, out dbid, CreateDatabaseGrbit.None);
-                    }
-                }
-            } 
-            catch 
-            {
-                // TODO: Wrap database already exists exception
-                throw;            
-            }
-
-        }
-
-        public static EseConnection Open(string filename) 
-        {
-            try {
-                var connection = new EseConnection(filename);
-                connection.Connect();
-                return connection;
-            } catch 
-            {
-                // TODO: wrap database is corrupt or does not exist. 
-                throw;
-            }
-        }
-
-        private void Connect() 
+        internal void Connect() 
         {
             instance = new Instance("connection");
             instance.Parameters.CircularLog = true;
@@ -83,6 +50,8 @@ namespace SimpleStorageEngine.Persistance.ExtensibleStorageEngine {
             base.Close();
         }
 
+       
+
         public override ITransaction BeginTransaction() {
             throw new NotImplementedException();
         }
@@ -91,8 +60,17 @@ namespace SimpleStorageEngine.Persistance.ExtensibleStorageEngine {
             get { throw new NotImplementedException(); }
         }
 
-        public override void CreateTable(string name, TableDefinition def) {
-            tableCreator.Create(name, def);
+        public override void CreateTable(TableDefinition def) {
+            tableCreator.Create(def);
+        }
+
+        public override bool TableExists(string name) {
+            bool found = false;
+            foreach (string tableName in Api.GetTableNames(session, dbid)) {
+                found = (tableName == name);
+                if (found) break;
+            }
+            return found;
         }
 
         public override void DropTable(string name) {

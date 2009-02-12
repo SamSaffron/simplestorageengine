@@ -20,13 +20,16 @@ namespace TestSimpleStorageEngine {
        
         static string directory = "test_data";
         static string filename = Path.GetFullPath(directory + "\\test.edb");
-        
+
+        ConnectionManager connectionManager;
+
         [SetUp]
         public void MyTestInitialize() 
         {
             Directory.CreateDirectory(directory);
-            EseConnection.CreateDatabase(filename);
-            
+
+            connectionManager = new EseConnectionManager(filename);
+            connectionManager.CreateDatabase(); 
         }
         
         [TearDown]
@@ -37,11 +40,9 @@ namespace TestSimpleStorageEngine {
         
         #endregion
 
-        private EseConnection GetConnection() { 
-           return EseConnection.Open(filename); 
+        private Connection GetConnection() {
+            return connectionManager.GetConnection();
         }
-
-
 
         [Test]
         public void TestTableCreation() 
@@ -63,7 +64,7 @@ namespace TestSimpleStorageEngine {
 
         private void CreatePersonTable() {
             using (var connection = GetConnection()) {
-                connection.CreateTable("person", new TableDefinition()
+                connection.CreateTable(new TableDefinition("person")
                     .AddColumn("ssn", typeof(int), true)
                     .AddColumn("name", typeof(string))
                     );
