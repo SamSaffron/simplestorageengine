@@ -4,7 +4,7 @@ using System.Text;
 using Microsoft.Isam.Esent.Interop;
 
 namespace SimpleStorageEngine.Persistance.ExtensibleStorageEngine {
-    public class EseConnection : IConnection {
+    public class EseConnection : Connection {
 
         internal Instance instance;
         internal Session session;
@@ -66,7 +66,7 @@ namespace SimpleStorageEngine.Persistance.ExtensibleStorageEngine {
         }
 
 
-        public void Close() {
+        public override void Close() {
 
             if (disposed) return; 
 
@@ -79,54 +79,33 @@ namespace SimpleStorageEngine.Persistance.ExtensibleStorageEngine {
             // TODO : exception out if there is an in progress transaction 
             session.Dispose();
             instance.Dispose();
+
+            base.Close();
         }
 
-        public ITransaction BeginTransaction() {
+        public override ITransaction BeginTransaction() {
             throw new NotImplementedException();
         }
 
-        public bool InTransaction {
+        public override bool InTransaction {
             get { throw new NotImplementedException(); }
         }
 
-        public void CreateTable(string name, TableDefinition def) {
+        public override void CreateTable(string name, TableDefinition def) {
             tableCreator.Create(name, def);
         }
 
-        public void DropTable(string name) {
+        public override void DropTable(string name) {
             throw new NotImplementedException();
         }
 
-        public Table GetTable(string name) {
+        public override Table GetTable(string name) {
             return new EseTable(this, name); 
         }
 
         #endregion
 
-        #region IDisposable Members
 
-        public void Dispose() {
-            // TODO: make this multithreaded ... 
-            // This is tricky cause we may need to reattach the DB 
-
-            if (disposed) return; 
-
-            Close(); 
-            disposed = true;
-            GC.SuppressFinalize(this); 
-        }
-
-        #endregion
-
-        ~EseConnection() 
-        {
-            try {
-                Dispose();
-            } catch 
-            {
-                // LOG
-                // Don't crash a finalizer thread. 
-            }
-        }
+        
     }
 }

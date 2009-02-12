@@ -5,10 +5,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleStorageEngine", "Simp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestSimpleStorageEngine", "TestSimpleStorageEngine\TestSimpleStorageEngine.csproj", "{3DFE40DA-8812-4D10-B035-EB88BC1E9255}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{0B98D91A-FF63-4151-AF51-54DA5A0231E8}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "nunit", "nunit", "{01B11D71-72EE-47B5-9E02-2615A61E721B}"
 	ProjectSection(SolutionItems) = preProject
-		LocalTestRun.testrunconfig = LocalTestRun.testrunconfig
-		SimpleStorageEngine.vsmdi = SimpleStorageEngine.vsmdi
+		NUnit\nunit.core.dll = NUnit\nunit.core.dll
+		NUnit\nunit.framework.dll = NUnit\nunit.framework.dll
 	EndProjectSection
 EndProject
 Global

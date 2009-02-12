@@ -8,12 +8,25 @@ namespace SimpleStorageEngine.Persistance.ExtensibleStorageEngine {
 
         EseConnection connection;
         string name;
-        IEnumerable<ColumnInfo> columnInfos; 
+        List<ColumnInfo> columnInfos;
+        string primaryKeyColumn; 
 
         internal EseTable(EseConnection connection, string name) {
             this.connection = connection;
             this.name = name;
-            columnInfos = Api.GetTableColumns(connection.session, connection.dbid, name);
+            columnInfos = new List<ColumnInfo>();
+            foreach (var ci in Api.GetTableColumns(connection.session, connection.dbid, name)) 
+            {
+                columnInfos.Add(ci); 
+            }
+            
+            foreach (var index in Api.GetTableIndexes(connection.session, connection.dbid, name))
+            {
+                if ((index.Grbit & CreateIndexGrbit.IndexPrimary) > 0) 
+                {
+                        primaryKeyColumn = index.IndexSegments[0].ColumnName;
+                }
+            }
         }
 
         public override void Insert(Row o) {
@@ -25,6 +38,7 @@ namespace SimpleStorageEngine.Persistance.ExtensibleStorageEngine {
                     Api.SetColumn(connection.session, table, column.Columnid, ToBytes(o[column.Name])); 
                 }
                 update.Save(); 
+                
                 transaction.Commit(CommitTransactionGrbit.None); 
             }
         }
@@ -37,11 +51,8 @@ namespace SimpleStorageEngine.Persistance.ExtensibleStorageEngine {
                 Api.MakeKey(connection.session, table, ToBytes(key), MakeKeyGrbit.NewKey);
                 Api.JetSeek(connection.session, table, SeekGrbit.SeekEQ);
                 foreach (var column in columnInfos) {
-
-                    // we need some special handling.
-
                     var bytes = Api.RetrieveColumn(connection.session, table, column.Columnid);
-
+                    // we need some special handling.
                     if (column.Coltyp == JET_coltyp.Long) {
                         row[column.Name] = BitConverter.ToInt32(bytes, 0);
                     } else {
@@ -74,37 +85,57 @@ namespace SimpleStorageEngine.Persistance.ExtensibleStorageEngine {
                 transaction.Commit(CommitTransactionGrbit.None);
             }
         }
-
+        
+        public override int Count {
+            get 
+            {
+                using (var table = new Microsoft.Isam.Esent.Interop.Table(connection.session, connection.dbid, name, OpenTableGrbit.None)) {
+                    Api.JetSetCurrentIndex(connection.session, table, null);
+                    int rval; 
+                    Api.JetIndexRecordCount(connection.session, table, out rval, 0);
+                    return rval;
+                }
+            }
+        }
         public override void Upsert(Row row) {
-            throw new NotImplementedException();
+            using (var transaction = new Transaction(connection.session)) 
+            {
+                // ESE runs in snapshot isloation and allows nested transaction 
+                if (Exists(row[primaryKeyColumn])) {
+                    Delete(row[primaryKeyColumn]);
+                }
+                Insert(row); 
+                transaction.Commit(CommitTransactionGrbit.None); 
+            }
         }
 
         public override void Truncate() {
-            throw new NotImplementedException();
+            using (var transaction = new Transaction(connection.session))
+            using (var table = new Microsoft.Isam.Esent.Interop.Table(connection.session, connection.dbid, name, OpenTableGrbit.None)) {
+                Api.MoveBeforeFirst(connection.session, table);
+                while (Api.TryMoveNext(connection.session, table)) 
+                {
+                    Api.JetDelete(connection.session, table); 
+                }
+                transaction.Commit(CommitTransactionGrbit.None);
+            }
         }
 
         public override List<ColumnDefinition> Columns {
             get 
             {
-                string primaryKey = ""; 
-                foreach (var index in Api.GetTableIndexes(connection.session, connection.dbid, name))
-                {
-                    if ((index.Grbit & CreateIndexGrbit.IndexPrimary) > 0) 
-                    {
-                        primaryKey = index.IndexSegments[0].ColumnName;
-                    }
-            	}
-
                 var rval = new List<ColumnDefinition> (); 
                 foreach (var column_info in columnInfos)
                 {
                     var def = new ColumnDefinition(column_info.Name, typeof(object), false);
-                    def.IsPrimaryKey = def.Name == primaryKey; 
+                    def.IsPrimaryKey = def.Name == primaryKeyColumn; 
                     rval.Add(def); 
                 }
                 return rval;
             }
         }
+
+        
 
         public override void Dispose() {
         }        

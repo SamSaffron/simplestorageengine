@@ -40,17 +40,26 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ActiveRecord\Attributes\TableNameAttribute.cs" />
     <Compile Include="Collections\Generic\PersistantDictionary.cs" />
-    <Compile Include="Persistance\ActiveRecord.cs" />
+    <Compile Include="ActiveRecord\ActiveRecord.cs" />
+    <Compile Include="ActiveRecord\ActiveRecordSettings.cs" />
+    <Compile Include="ActiveRecord\BelongsTo.cs" />
     <Compile Include="Persistance\ColumnDefinition.cs" />
+    <Compile Include="ActiveRecord\Attributes\ColumnInfoAttribute.cs" />
     <Compile Include="Persistance\ExtensibleStorageEngine\EseConnection.cs" />
+    <Compile Include="Persistance\ExtensibleStorageEngine\EseConnectionManager.cs" />
     <Compile Include="Persistance\ExtensibleStorageEngine\EseException.cs" />
     <Compile Include="Persistance\ExtensibleStorageEngine\EseTable.cs" />
     <Compile Include="Persistance\ExtensibleStorageEngine\EseTableCreator.cs" />
-    <Compile Include="Persistance\IConnection.cs" />
+    <Compile Include="ActiveRecord\HasMany.cs" />
+    <Compile Include="Persistance\Connection.cs" />
+    <Compile Include="Persistance\ConnectionManager.cs" />
     <Compile Include="Persistance\Index.cs" />
+    <Compile Include="ActiveRecord\Attributes\IndexAttribute.cs" />
     <Compile Include="Persistance\IndexDefinition.cs" />
     <Compile Include="Persistance\ITransaction.cs" />
+    <Compile Include="ActiveRecord\Attributes\PrimaryKeyAttribute.cs" />
     <Compile Include="Persistance\Row.cs" />
     <Compile Include="Persistance\Table.cs" />
     <Compile Include="Persistance\TableDefinition.cs" />

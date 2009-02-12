@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Text;
 using System.Collections.Generic;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 using SimpleStorageEngine.Persistance.ExtensibleStorageEngine;
 using SimpleStorageEngine.Persistance;
 using System.IO;
@@ -10,43 +10,18 @@ namespace TestSimpleStorageEngine {
     /// <summary>
     /// Summary description for UnitTest1
     /// </summary>
-    [TestClass]
-    public class TestEse {
-        public TestEse() {
+    [TestFixture]
+    public class TestPersistance {
+        public TestPersistance() {
         }
 
-        private TestContext testContextInstance;
-
-        /// <summary>
-        ///Gets or sets the test context which provides
-        ///information about and functionality for the current test run.
-        ///</summary>
-        public TestContext TestContext {
-            get {
-                return testContextInstance;
-            }
-            set {
-                testContextInstance = value;
-            }
-        }
 
         #region Additional test attributes
-        //
-        // You can use the following additional attributes as you write your tests:
-        //
-        // Use ClassInitialize to run code before running the first test in the class
-        // [ClassInitialize()]
-        // public static void MyClassInitialize(TestContext testContext) { }
-        //
-        // Use ClassCleanup to run code after all tests in a class have run
-        // [ClassCleanup()]
-        // public static void MyClassCleanup() { }
-        //
-
+       
         static string directory = "test_data";
         static string filename = Path.GetFullPath(directory + "\\test.edb");
         
-        [TestInitialize()]
+        [SetUp]
         public void MyTestInitialize() 
         {
             Directory.CreateDirectory(directory);
@@ -54,7 +29,7 @@ namespace TestSimpleStorageEngine {
             
         }
         
-        [TestCleanup()]
+        [TearDown]
         public void MyTestCleanup() 
         {
             Directory.Delete(directory, true);
@@ -68,7 +43,7 @@ namespace TestSimpleStorageEngine {
 
 
 
-        [TestMethod]
+        [Test]
         public void TestTableCreation() 
         {
             CreatePersonTable();
@@ -95,7 +70,7 @@ namespace TestSimpleStorageEngine {
             }
         }
 
-        [TestMethod]
+        [Test]
         public void TestDataLookup() 
         {
             CreatePersonTable();
@@ -117,7 +92,7 @@ namespace TestSimpleStorageEngine {
             }
         }
 
-        [TestMethod] 
+        [Test] 
         public void TestDataDeletion() 
         {
             CreatePersonTable();
@@ -139,6 +114,47 @@ namespace TestSimpleStorageEngine {
             }
         }
 
+        [Test]
+        public void TestTruncate() 
+        {
+            CreatePersonTable();
+            using (var connection = GetConnection()) 
+            {
+                var t = connection.GetTable("person");
+                
+                for (int i = 0; i < 100; i++) {
+                    var row = new Row();
+                    row["ssn"] = i;
+                    row["name"] = "Booboo";
+                    t.Insert(row); 
+                }
+                Assert.AreEqual(100, t.Count); 
+                t.Truncate();
+                Assert.AreEqual(0, t.Count);
+            }
+        }
+
+        [Test]
+        public void TestUpsert() 
+        {
+            CreatePersonTable(); 
+            using (var connection = GetConnection()) {
+
+                var t = connection.GetTable("person");
+
+                var row = new Row();
+                row["ssn"] = 1;
+                row["name"] = "Booboo";
+                t.Upsert(row);
+
+                Assert.AreEqual("Booboo", t.Get(1)["name"]);
+
+                row["name"] = "bob";
+                t.Upsert(row); 
+                
+                Assert.AreEqual("bob", t.Get(1)["name"]);
+            }
+        }
 
     }
 }

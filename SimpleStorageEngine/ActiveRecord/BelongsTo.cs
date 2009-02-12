@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace SimpleStorageEngine.Persistance {
-    class ActiveRecord {
+namespace SimpleStorageEngine.ActiveRecord {
+    public class BelongsTo<T> {
     }
 }
