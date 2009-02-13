@@ -25,18 +25,22 @@ namespace SimpleStorageEngine.ActiveRecord {
             Row row = new Row();
             Type type = typeof(T); 
             foreach (var property in Properties) {
-                row[property.Name]= property.GetValue(obj, null); 
+                row[property.Name] = property.GetValue(obj, null); 
             }
             return row;
         }
 
         public T FromRow(Row row) {
             T obj = new T();
+            PopulateObjectFromRow(row, obj);
+            return obj;
+        }
+
+        public void PopulateObjectFromRow(Row row, T obj) {
             Type type = typeof(T);
             foreach (var property in Properties) {
-                property.SetValue(obj, row[property.Name],null);
+                property.SetValue(obj, row[property.Name], null);
             }
-            return obj;
         }
 
     }

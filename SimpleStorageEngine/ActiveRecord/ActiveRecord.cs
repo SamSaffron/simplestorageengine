@@ -21,9 +21,20 @@ namespace SimpleStorageEngine.ActiveRecord {
 
 
 
+        static string tableName = null; 
         public static string TableName {
             get {
-                return typeof(TClass).Name;
+                if (tableName == null) {
+                    foreach (var attrib in typeof(TClass).GetCustomAttributes(typeof(TableNameAttribute),false) ) {
+                        tableName = ((TableNameAttribute)attrib).Name;
+                        break;
+                    }
+
+                    if (tableName == null) { 
+                        tableName = typeof(TClass).Name;
+                    }
+                }
+                return tableName;
             }
         }
 
@@ -58,7 +69,7 @@ namespace SimpleStorageEngine.ActiveRecord {
         public static TClass Find(TKey key) {
             using (var connection = ActiveRecordSettings.ConnectionManager.GetConnection())
             using (var table = connection.GetTable(TableName)) {
-                var row = table.Get(key);
+                var row = table.GetRow(key);
                 return rowSerializer.FromRow(row);
             }
         }
@@ -71,7 +82,9 @@ namespace SimpleStorageEngine.ActiveRecord {
         {
             using (var connection = ActiveRecordSettings.ConnectionManager.GetConnection()) {
                 if (connection.TableExists(TableName)) {
-                    throw new NotImplementedException();
+                    using (Table t = connection.GetTable(TableName)) { 
+                        
+                    }
                 } 
                 else {
                     connection.CreateTable(TableDefinition);
@@ -84,7 +97,9 @@ namespace SimpleStorageEngine.ActiveRecord {
             using (var connection = ActiveRecordSettings.ConnectionManager.GetConnection()) 
             using (var table = connection.GetTable(TableName))
             {
-                table.Insert(rowSerializer.ToRow(this as TClass));    
+                var row = rowSerializer.ToRow(this as TClass); 
+                table.Insert(row);
+                rowSerializer.PopulateObjectFromRow(row, this as TClass);
             }
         }
     }
