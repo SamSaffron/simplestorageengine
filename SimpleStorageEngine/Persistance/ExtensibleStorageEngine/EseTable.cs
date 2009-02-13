@@ -19,23 +19,24 @@ namespace SimpleStorageEngine.Persistance.ExtensibleStorageEngine {
         internal EseTable(EseConnection connection, string name) {
             this.connection = connection;
             this.name = name;
+            RefreshTableInfo();
+        }
+
+        private void RefreshTableInfo() {
             columnInfos = new List<ColumnInfo>();
-            foreach (var ci in Api.GetTableColumns(connection.session, connection.dbid, name)) 
-            {
+            foreach (var ci in Api.GetTableColumns(connection.session, connection.dbid, name)) {
                 if ((ci.Grbit & ColumndefGrbit.ColumnAutoincrement) > 0) {
                     autoIncrementColumn = ci;
                     hasAutoIncrementColumn = true;
                 }
-                columnInfos.Add(ci); 
+                columnInfos.Add(ci);
             }
-            
+
             indexes = Api.GetTableIndexes(connection.session, connection.dbid, name);
-            foreach (var index in indexes)
-            {
+            foreach (var index in indexes) {
                 // primary key is only on one column
-                if ((index.Grbit & CreateIndexGrbit.IndexPrimary) > 0) 
-                {
-                        primaryKeyColumn = index.IndexSegments[0].ColumnName;
+                if ((index.Grbit & CreateIndexGrbit.IndexPrimary) > 0) {
+                    primaryKeyColumn = index.IndexSegments[0].ColumnName;
                 }
             }
         }
@@ -46,6 +47,7 @@ namespace SimpleStorageEngine.Persistance.ExtensibleStorageEngine {
             using (var update = new Update(connection.session, table, JET_prep.Insert))
             {
                 foreach (var column in columnInfos) {
+                    if (autoIncrementColumn != null && column.Name == autoIncrementColumn.Name) continue;
                     object val;
                     if (o.TryGetValue(column.Name, out val)) {
                         Api.SetColumn(connection.session, table, column.Columnid, ToBytes(val));
@@ -63,7 +65,7 @@ namespace SimpleStorageEngine.Persistance.ExtensibleStorageEngine {
             }
         }
 
-        public override Row Get(object key) {
+        public override Row GetRow(object key) {
             using (var table = new Microsoft.Isam.Esent.Interop.Table(connection.session, connection.dbid, name, OpenTableGrbit.None))
             {
                 
@@ -201,9 +203,29 @@ namespace SimpleStorageEngine.Persistance.ExtensibleStorageEngine {
         }
 
 
+     
+
+
+        public override TableDefinition TableDefinition {
+            get { throw new NotImplementedException(); }
+        }
+
+        public override void AddColumn(ColumnDefinition columnDef) {
+             using (var transaction = new Transaction(connection.session))
+             using (var table = new Microsoft.Isam.Esent.Interop.Table(connection.session, connection.dbid, name, OpenTableGrbit.None)) {
+                 var tableCreator = new EseTableCreator(connection);
+                 tableCreator.AddColumn(table, columnDef);
+                 transaction.Commit(CommitTransactionGrbit.None);
+             }
+             RefreshTableInfo();
+        }
+
+        public override void RemoveColumn(string columnName) {
+            throw new NotImplementedException();
+        }
+
         public override void Dispose() {
         }
 
-      
     }
 }

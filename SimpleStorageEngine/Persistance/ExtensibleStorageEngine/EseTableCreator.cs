@@ -49,30 +49,7 @@ namespace SimpleStorageEngine.Persistance.ExtensibleStorageEngine {
 
                 foreach (var column in def.ColumnDefinitions) {
 
-                    JET_COLUMNDEF column_def;
-                    JET_COLUMNID column_id;
-                    
-                    if (columnDefs.ContainsKey(column.Type))
-                    {
-                        column_def = columnDefs[column.Type]; 
-                    }
-                    else 
-                    {
-                        column_def = new JET_COLUMNDEF(); 
-                        column_def.coltyp = JET_coltyp.LongBinary;
-                    }
-
-                    // TODO validate only one of these
-                    if (column.IsAutoIncrement) {
-                        column_def.grbit = column_def.grbit | ColumndefGrbit.ColumnAutoincrement;
-                    }
-
-                    Api.JetAddColumn(connection.session, tableid, column.Name, column_def, null, 0, out column_id); 
-                    if (column.IsPrimaryKey) 
-                    {
-                        var indexDef = "+" + column.Name + "\0\0";
-                        Api.JetCreateIndex(connection.session, tableid, "primary", CreateIndexGrbit.IndexPrimary, indexDef, indexDef.Length, 100); 
-                    }
+                    AddColumn(tableid, column);
                 }
 
                 foreach (var item in def.Indexes) {
@@ -83,6 +60,31 @@ namespace SimpleStorageEngine.Persistance.ExtensibleStorageEngine {
                 }
 
                 transaction.Commit(CommitTransactionGrbit.LazyFlush); 
+            }
+        }
+
+        public void AddColumn(JET_TABLEID tableid, ColumnDefinition column) {
+            
+            JET_COLUMNDEF column_def;
+            JET_COLUMNID column_id;
+
+            if (columnDefs.ContainsKey(column.Type)) {
+                column_def = columnDefs[column.Type];
+            } else {
+                column_def = new JET_COLUMNDEF();
+                column_def.coltyp = JET_coltyp.LongBinary;
+            }
+
+            // TODO validate only one of these
+            if (column.IsAutoIncrement) {
+                column_def.grbit = column_def.grbit | ColumndefGrbit.ColumnAutoincrement;
+            }
+
+            Api.JetAddColumn(connection.session, tableid, column.Name, column_def, null, 0, out column_id);
+
+            if (column.IsPrimaryKey) {
+                var indexDef = "+" + column.Name + "\0\0";
+                Api.JetCreateIndex(connection.session, tableid, "primary", CreateIndexGrbit.IndexPrimary, indexDef, indexDef.Length, 100);
             }
         }
     }

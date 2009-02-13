@@ -7,7 +7,6 @@ using System.IO;
 namespace SimpleStorageEngine.Persistance {
     public abstract class Table : IDisposable {
 
-
         // Helper methods
         protected byte[] ToBytes(object obj) {
 
@@ -50,7 +49,7 @@ namespace SimpleStorageEngine.Persistance {
         }
 
         public abstract void Insert(Row o);
-        public abstract Row Get(object key);
+        public abstract Row GetRow(object key);
         public abstract IEnumerable<Row> GetRows();
         public abstract IEnumerable<Row> GetRows(Row indexValue); 
         public abstract bool Exists(object key);
@@ -58,6 +57,9 @@ namespace SimpleStorageEngine.Persistance {
         public abstract void Upsert(Row row);
         public abstract void Truncate();
         public abstract int Count { get; }
+        public abstract TableDefinition TableDefinition { get; }
+        public abstract void AddColumn(ColumnDefinition columnDef); 
+        public abstract void RemoveColumn(string columnName); 
 
         public abstract List<ColumnDefinition> Columns { get; }
 
