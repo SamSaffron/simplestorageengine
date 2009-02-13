@@ -5,6 +5,7 @@ using NUnit.Framework;
 using SimpleStorageEngine.Persistance.ExtensibleStorageEngine;
 using SimpleStorageEngine.Persistance;
 using System.IO;
+using System.Linq;
 
 namespace TestSimpleStorageEngine {
     /// <summary>
@@ -133,6 +134,22 @@ namespace TestSimpleStorageEngine {
                 t.Truncate();
                 Assert.AreEqual(0, t.Count);
             }
+        }
+
+        [Test]
+        public void TestGetAllRows() {
+            CreatePersonTable();
+            using (var connection = GetConnection()) {
+                var t = connection.GetTable("person");
+                for (int i = 0; i < 100; i++) {
+                    var row = new Row();
+                    row["ssn"] = i;
+                    row["name"] = "Booboo" + i.ToString();
+                    t.Insert(row);
+                }
+                var rows = t.GetRows();
+                Assert.AreEqual(100,Enumerable.Count(rows)); 
+            } 
         }
 
         [Test]

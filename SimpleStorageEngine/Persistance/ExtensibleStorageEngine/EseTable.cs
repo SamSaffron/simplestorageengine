@@ -63,23 +63,28 @@ namespace SimpleStorageEngine.Persistance.ExtensibleStorageEngine {
         public override Row Get(object key) {
             using (var table = new Microsoft.Isam.Esent.Interop.Table(connection.session, connection.dbid, name, OpenTableGrbit.None))
             {
-                Row row = new Row();
+                
                 Api.JetSetCurrentIndex(connection.session, table, null);
                 Api.MakeKey(connection.session, table, ToBytes(key), MakeKeyGrbit.NewKey);
                 Api.JetSeek(connection.session, table, SeekGrbit.SeekEQ);
-                foreach (var column in columnInfos) {
-                    var bytes = Api.RetrieveColumn(connection.session, table, column.Columnid);
-                    // we need some special handling.
-                    if (column.Coltyp == JET_coltyp.Long) {
-                        row[column.Name] = BitConverter.ToInt32(bytes, 0);
-                    } else {
-                        row[column.Name] = FromBytes<object>(bytes);
-                    }
-                }
-
+                Row row = GetCurrentRow(table);
                 return row;
             }
             // TODO: error wrapping
+        }
+
+        private Row GetCurrentRow(Microsoft.Isam.Esent.Interop.Table table) {
+            Row row = new Row();
+            foreach (var column in columnInfos) {
+                var bytes = Api.RetrieveColumn(connection.session, table, column.Columnid);
+                // we need some special handling.
+                if (column.Coltyp == JET_coltyp.Long) {
+                    row[column.Name] = BitConverter.ToInt32(bytes, 0);
+                } else {
+                    row[column.Name] = FromBytes<object>(bytes);
+                }
+            }
+            return row;
         }
 
         public override bool Exists(object key) {
@@ -159,7 +164,26 @@ namespace SimpleStorageEngine.Persistance.ExtensibleStorageEngine {
 
         
 
+
+        public override IEnumerable<Row> GetRows() {
+            using (var table = new Microsoft.Isam.Esent.Interop.Table(connection.session, connection.dbid, name, OpenTableGrbit.None)) {
+                
+                Api.MoveBeforeFirst(connection.session, table);
+                
+                while(Api.TryMoveNext(connection.session, table))
+                {
+                   yield return GetCurrentRow(table); 
+                }
+            }
+        }
+
+
+
         public override void Dispose() {
-        }        
+        }
+
+        public override IEnumerable<Row> GetRows(Row indexValue) {
+            throw new NotImplementedException();
+        }
     }
 }

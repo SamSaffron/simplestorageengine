@@ -51,6 +51,8 @@ namespace SimpleStorageEngine.Persistance {
 
         public abstract void Insert(Row o);
         public abstract Row Get(object key);
+        public abstract IEnumerable<Row> GetRows();
+        public abstract IEnumerable<Row> GetRows(Row indexValue); 
         public abstract bool Exists(object key);
         public abstract void Delete(object key);
         public abstract void Upsert(Row row);
