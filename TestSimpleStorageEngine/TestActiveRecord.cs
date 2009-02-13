@@ -81,7 +81,7 @@ namespace TestSimpleStorageEngine {
 
 
         [SetUp]
-        public void TestInitialize() {
+        public void Initialize() {
             Directory.CreateDirectory(directory);
 
             connectionManager = new EseConnectionManager(filename);
@@ -90,7 +90,7 @@ namespace TestSimpleStorageEngine {
         }
 
         [TearDown]
-        public void TestCleanup() {
+        public void Cleanup() {
             Directory.Delete(directory, true);
         }
 
@@ -102,7 +102,6 @@ namespace TestSimpleStorageEngine {
             Person.Migrate();
             var p = Person.Build();
             p.Name = "hello";
-            p.Id = 1;
             p.Save();
             p = Person.Find(p.Id);
             Assert.AreEqual("hello", p.Name);

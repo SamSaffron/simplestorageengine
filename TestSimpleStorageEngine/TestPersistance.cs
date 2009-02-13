@@ -86,7 +86,7 @@ namespace TestSimpleStorageEngine {
 
             using (var connection = GetConnection()) {
                 var t = connection.GetTable("person");
-                var row = t.Get(1000);
+                var row = t.GetRow(1000);
                 Assert.AreEqual(row["ssn"], 1000);
                 Assert.AreEqual(row["name"], "Booboo"); 
             }
@@ -168,8 +168,8 @@ namespace TestSimpleStorageEngine {
 
                 Assert.AreEqual(t.Count, 2);
 
-                Assert.AreEqual(row, t.Get(row["ssn"]));
-                Assert.AreEqual(row2, t.Get(row2["ssn"])); 
+                Assert.AreEqual(row, t.GetRow(row["ssn"]));
+                Assert.AreEqual(row2, t.GetRow(row2["ssn"])); 
             }
             
         }
@@ -242,12 +242,28 @@ namespace TestSimpleStorageEngine {
                 row["name"] = "Booboo";
                 t.Upsert(row);
 
-                Assert.AreEqual("Booboo", t.Get(1)["name"]);
+                Assert.AreEqual("Booboo", t.GetRow(1)["name"]);
 
                 row["name"] = "bob";
                 t.Upsert(row); 
                 
-                Assert.AreEqual("bob", t.Get(1)["name"]);
+                Assert.AreEqual("bob", t.GetRow(1)["name"]);
+            }
+        }
+
+        [Test]
+        public void TestAddingAColumnToATable() {
+            CreatePersonTable();
+
+            using (var connection = GetConnection()) {
+                var t = connection.GetTable("person"); 
+                t.AddColumn(new ColumnDefinition("comments", typeof(string)));
+                t.Insert(new Row().SetValue("ssn", 1)
+                    .SetValue("name", "test")
+                    .SetValue("comments", "here go the comments")
+                    );
+
+                Assert.AreEqual("here go the comments", t.GetRow(1)["comments"]); 
             }
         }
 
