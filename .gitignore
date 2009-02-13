@@ -6,3 +6,7 @@ TestSimpleStorageEngine/obj
 SimpleStorageEngine.suo
 SimpleStorageEngine/bin
 LocalTestRun.testrunconfig
+SqliteMergeModule/bin
+SqliteMergeModule/obj
+TestSqliteMergeModule/bin
+TestSqliteMergeModule/obj
