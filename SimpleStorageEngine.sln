@@ -12,6 +12,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "nunit", "nunit", "{01B11D71
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "databases", "databases", "{330957C7-E0A3-4645-8797-893ED0E8F7DA}"
+	ProjectSection(SolutionItems) = preProject
+		Databases\Esent.Interop.dll = Databases\Esent.Interop.dll
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SqliteMergeModule", "SqliteMergeModule\SqliteMergeModule.csproj", "{15BB1D8E-4BA2-4EFF-9A1E-64F50F3648A7}"
 EndProject

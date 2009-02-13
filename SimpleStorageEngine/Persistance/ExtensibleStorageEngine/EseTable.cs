@@ -14,6 +14,7 @@ namespace SimpleStorageEngine.Persistance.ExtensibleStorageEngine {
         // only support 1 auto increment column for now
         bool hasAutoIncrementColumn = false;
         ColumnInfo autoIncrementColumn;
+        IEnumerable<IndexInfo> indexes;
 
         internal EseTable(EseConnection connection, string name) {
             this.connection = connection;
@@ -28,8 +29,10 @@ namespace SimpleStorageEngine.Persistance.ExtensibleStorageEngine {
                 columnInfos.Add(ci); 
             }
             
-            foreach (var index in Api.GetTableIndexes(connection.session, connection.dbid, name))
+            indexes = Api.GetTableIndexes(connection.session, connection.dbid, name);
+            foreach (var index in indexes)
             {
+                // primary key is only on one column
                 if ((index.Grbit & CreateIndexGrbit.IndexPrimary) > 0) 
                 {
                         primaryKeyColumn = index.IndexSegments[0].ColumnName;
@@ -167,9 +170,7 @@ namespace SimpleStorageEngine.Persistance.ExtensibleStorageEngine {
 
         public override IEnumerable<Row> GetRows() {
             using (var table = new Microsoft.Isam.Esent.Interop.Table(connection.session, connection.dbid, name, OpenTableGrbit.None)) {
-                
-                Api.MoveBeforeFirst(connection.session, table);
-                
+                Api.MoveBeforeFirst(connection.session, table);  
                 while(Api.TryMoveNext(connection.session, table))
                 {
                    yield return GetCurrentRow(table); 
@@ -177,13 +178,32 @@ namespace SimpleStorageEngine.Persistance.ExtensibleStorageEngine {
             }
         }
 
+        public override IEnumerable<Row> GetRows(Row lookupValue) {
+            using (var table = new Microsoft.Isam.Esent.Interop.Table(connection.session, connection.dbid, name, OpenTableGrbit.None)) {
+                Api.MoveBeforeFirst(connection.session, table);
+                while (Api.TryMoveNext(connection.session, table)) {
+                    Row row = GetCurrentRow(table);
+                    
+                    bool found = true; 
+                    foreach (var item in lookupValue)
+	                {
+                        var column = row[item.Key];
+                        if (column == null && item.Value == null) continue;
+                        if (column == null || item.Value == null || !column.Equals(item.Value)) {
+                            found = false;
+                            break; 
+                        }
+	                }
+
+                    if (found) yield return row;
+                }
+            }
+        }
 
 
         public override void Dispose() {
         }
 
-        public override IEnumerable<Row> GetRows(Row indexValue) {
-            throw new NotImplementedException();
-        }
+      
     }
 }

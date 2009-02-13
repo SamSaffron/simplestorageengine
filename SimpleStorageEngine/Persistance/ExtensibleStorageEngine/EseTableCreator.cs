@@ -75,6 +75,13 @@ namespace SimpleStorageEngine.Persistance.ExtensibleStorageEngine {
                     }
                 }
 
+                foreach (var item in def.Indexes) {
+                    // all indexes are ascending
+                    var indexName = string.Join("|", item.ToArray());
+                    var indexDef = "+" + string.Join("\0+", item.ToArray()) + "\0\0";
+                    Api.JetCreateIndex(connection.session, tableid, indexName, CreateIndexGrbit.IndexSortNullsHigh, indexDef, indexDef.Length, 100);
+                }
+
                 transaction.Commit(CommitTransactionGrbit.LazyFlush); 
             }
         }

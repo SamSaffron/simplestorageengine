@@ -4,40 +4,13 @@ using System.Text;
 using System.Collections;
 
 namespace SimpleStorageEngine.Persistance {
-    public class Row {
-        Dictionary<string, object> data = new Dictionary<string, object>();
-
-        public Row SetValue(string key, object data) {
-            this[key] = data; 
-            return this;
-        }
-
-        public bool ContainsKey(string key) {
-            return data.ContainsKey(key);
-        }
-
-        public bool TryGetValue(string key, out object o)
-        {
-            return data.TryGetValue(key, out o); 
-        }
-
-        public object this[string columnName]
-        {
-            get 
-            {
-                return data[columnName]; 
-            }
-            set 
-            {
-                data[columnName] = value;
-            }
-        }
+    public class Row : Dictionary<string, object> {
 
         public override bool Equals(object obj) {
             Row other = obj as Row;
-            if (other == null || other.data.Count != data.Count) return false;
+            if (other == null || other.Count != Count) return false;
             
-            foreach (var item in data) {
+            foreach (var item in this) {
                 object val;
                 if (!other.TryGetValue(item.Key, out val)) return false;
                 if (val == null && item.Value == null) continue;
@@ -47,7 +20,12 @@ namespace SimpleStorageEngine.Persistance {
         }
 
         public override int GetHashCode() {
-            return data.GetHashCode();
+            return base.GetHashCode();
+        }
+
+        public Row SetValue(string key, object value) {
+            this[key] = value;
+            return this;
         }
     }
 }

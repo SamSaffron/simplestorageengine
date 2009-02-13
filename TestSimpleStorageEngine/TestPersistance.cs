@@ -177,6 +177,37 @@ namespace TestSimpleStorageEngine {
         }
 
         [Test]
+        public void TestPartialLookup() {
+            using (var connection = GetConnection()) {
+                connection.CreateTable(new TableDefinition("person")
+                    .AddColumn("id", typeof(int), ColumnProperties.PrimaryKey)
+                    .AddColumn("firstname", typeof(string))
+                    .AddColumn("lastname", typeof(string))
+                    .AddIndex("lastname")
+                    );
+
+                var t = connection.GetTable("person"); 
+
+                for (int i = 0; i < 100; i++) {
+                    t.Insert(new Row()
+                        .SetValue("id",i)
+                        .SetValue("firstname", "aaa" + i.ToString())
+                        .SetValue("lastname", "bbb")); 
+                }
+
+                for (int i = 100; i < 150; i++) {
+                    t.Insert(new Row()
+                        .SetValue("id", i)
+                        .SetValue("firstname", "aaa" + i.ToString())
+                        .SetValue("lastname", "ccc"));
+                }
+
+                var rows = t.GetRows(new Row().SetValue("lastname", "ccc"));
+                Assert.AreEqual(50, Enumerable.Count(rows)); 
+            }
+        }
+
+        [Test]
         public void TestUpsert() 
         {
             CreatePersonTable(); 
