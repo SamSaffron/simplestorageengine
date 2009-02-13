@@ -55,7 +55,7 @@ namespace SimpleStorageEngine.Persistance {
         public abstract void Delete(object key);
         public abstract void Upsert(Row row);
         public abstract void Truncate();
-        public abstract int Count { get; } 
+        public abstract int Count { get; }
 
         public abstract List<ColumnDefinition> Columns { get; }
 

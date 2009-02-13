@@ -6,7 +6,6 @@ using Microsoft.Isam.Esent.Interop;
 namespace SimpleStorageEngine.Persistance.ExtensibleStorageEngine {
     internal class EseTableCreator {
         EseConnection connection;
-
         static Dictionary<Type, JET_COLUMNDEF> columnDefs;
  
         static EseTableCreator()
@@ -61,6 +60,11 @@ namespace SimpleStorageEngine.Persistance.ExtensibleStorageEngine {
                     {
                         column_def = new JET_COLUMNDEF(); 
                         column_def.coltyp = JET_coltyp.LongBinary;
+                    }
+
+                    // TODO validate only one of these
+                    if (column.IsAutoIncrement) {
+                        column_def.grbit = column_def.grbit | ColumndefGrbit.ColumnAutoincrement;
                     }
 
                     Api.JetAddColumn(connection.session, tableid, column.Name, column_def, null, 0, out column_id); 

@@ -145,11 +145,16 @@ namespace TestSimpleStorageEngine {
             }
 
             using (var connection = GetConnection()) {
-
                 var t = connection.GetTable("person");
-            
-                
-            
+                var row = new Row().SetValue("name", "bob");
+                var row2 = new Row().SetValue("name", "bob2"); 
+                t.Insert(row);
+                t.Insert(row2);
+
+                Assert.AreEqual(t.Count, 2);
+
+                Assert.AreEqual(row, t.Get(row["ssn"]));
+                Assert.AreEqual(row2, t.Get(row2["ssn"])); 
             }
             
         }

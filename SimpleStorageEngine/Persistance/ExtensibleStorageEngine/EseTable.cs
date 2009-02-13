@@ -9,7 +9,11 @@ namespace SimpleStorageEngine.Persistance.ExtensibleStorageEngine {
         EseConnection connection;
         string name;
         List<ColumnInfo> columnInfos;
-        string primaryKeyColumn; 
+        // only support 1 primary key column for now
+        string primaryKeyColumn;
+        // only support 1 auto increment column for now
+        bool hasAutoIncrementColumn = false;
+        ColumnInfo autoIncrementColumn;
 
         internal EseTable(EseConnection connection, string name) {
             this.connection = connection;
@@ -17,6 +21,10 @@ namespace SimpleStorageEngine.Persistance.ExtensibleStorageEngine {
             columnInfos = new List<ColumnInfo>();
             foreach (var ci in Api.GetTableColumns(connection.session, connection.dbid, name)) 
             {
+                if ((ci.Grbit & ColumndefGrbit.ColumnAutoincrement) > 0) {
+                    autoIncrementColumn = ci;
+                    hasAutoIncrementColumn = true;
+                }
                 columnInfos.Add(ci); 
             }
             
@@ -35,9 +43,18 @@ namespace SimpleStorageEngine.Persistance.ExtensibleStorageEngine {
             using (var update = new Update(connection.session, table, JET_prep.Insert))
             {
                 foreach (var column in columnInfos) {
-                    Api.SetColumn(connection.session, table, column.Columnid, ToBytes(o[column.Name])); 
+                    object val;
+                    if (o.TryGetValue(column.Name, out val)) {
+                        Api.SetColumn(connection.session, table, column.Columnid, ToBytes(val));
+                    }
                 }
-                update.Save(); 
+                update.Save();
+
+                if (hasAutoIncrementColumn) {
+                    Api.MoveAfterLast(connection.session, table);
+                    Api.TryMovePrevious(connection.session, table); 
+                    o[autoIncrementColumn.Name] = Api.RetrieveColumnAsInt32(connection.session, table, autoIncrementColumn.Columnid); 
+                }
                 
                 transaction.Commit(CommitTransactionGrbit.None); 
             }

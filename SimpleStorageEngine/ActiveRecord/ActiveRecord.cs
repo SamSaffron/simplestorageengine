@@ -35,7 +35,6 @@ namespace SimpleStorageEngine.ActiveRecord {
 
                 ColumnProperties properties = ColumnProperties.None;
 
-                bool isPrimaryKey = false;
                 foreach (Attribute attribute in property.GetCustomAttributes(false))
                 {
                     PrimaryKeyAttribute primaryKeyAttrib = attribute as PrimaryKeyAttribute;
