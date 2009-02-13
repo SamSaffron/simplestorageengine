@@ -5,14 +5,26 @@ using System.Text;
 namespace SimpleStorageEngine.Persistance {
     public class ColumnDefinition {
 
-        public ColumnDefinition(string columnName, Type type, bool isPrimaryKey) {
-            this.Name = columnName;
-            this.Type = type; 
-            this.IsPrimaryKey = isPrimaryKey;
+        public ColumnDefinition(string columnName, Type type) :
+            this(columnName, type, ColumnProperties.None) {
         }
 
-        public bool IsPrimaryKey { get; set; }
+        public ColumnDefinition(string columnName, Type type, ColumnProperties flags) {
+            this.Name = columnName;
+            this.Type = type;
+            this.ColumnProperties = ColumnProperties;
+        }
+
+ 
         public string Name { get; set; }
         public Type Type { get; set; }
+        public ColumnProperties ColumnProperties { get; set; }
+
+        public bool IsPrimaryKey { 
+            get { 
+                return ((ColumnProperties & ColumnProperties.PrimaryKey) == ColumnProperties.PrimaryKey); 
+            } 
+        }
     }
+
 }

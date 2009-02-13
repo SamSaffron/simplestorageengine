@@ -127,8 +127,13 @@ namespace SimpleStorageEngine.Persistance.ExtensibleStorageEngine {
                 var rval = new List<ColumnDefinition> (); 
                 foreach (var column_info in columnInfos)
                 {
-                    var def = new ColumnDefinition(column_info.Name, typeof(object), false);
-                    def.IsPrimaryKey = def.Name == primaryKeyColumn; 
+                    var def = new ColumnDefinition(column_info.Name, typeof(object));
+                    if (def.Name == primaryKeyColumn) {
+                        def.ColumnProperties |= ColumnProperties.PrimaryKey;   
+                    }
+                    if (column_info.Grbit == ColumndefGrbit.ColumnAutoincrement) {
+                        def.ColumnProperties |= ColumnProperties.AutoIncrement;
+                    }
                     rval.Add(def); 
                 }
                 return rval;

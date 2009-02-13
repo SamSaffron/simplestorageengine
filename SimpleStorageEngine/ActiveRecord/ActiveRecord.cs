@@ -31,18 +31,24 @@ namespace SimpleStorageEngine.ActiveRecord {
         {
             tableDefinition = new TableDefinition(TableName);
 
-            foreach (var property in typeof(TClass).GetProperties(BindingFlags.Public | BindingFlags.Instance)) {
+            foreach (var property in RowSerializer<TClass>.Properties) {
+
+                ColumnProperties properties = ColumnProperties.None;
 
                 bool isPrimaryKey = false;
                 foreach (Attribute attribute in property.GetCustomAttributes(false))
                 {
-                    if (attribute is PrimaryKeyAttribute) {
-                        isPrimaryKey = true;
+                    PrimaryKeyAttribute primaryKeyAttrib = attribute as PrimaryKeyAttribute;
+                    if (primaryKeyAttrib != null) {
+                        properties |= ColumnProperties.PrimaryKey;
+                        if (primaryKeyAttrib.AutoIncrement) {
+                            properties |= ColumnProperties.AutoIncrement;
+                        }
                         break;
                     }
                 }
-                
-                tableDefinition.AddColumn(new ColumnDefinition(property.Name, property.PropertyType, isPrimaryKey)); 
+
+                tableDefinition.AddColumn(new ColumnDefinition(property.Name, property.PropertyType, properties)); 
             }
         }
 

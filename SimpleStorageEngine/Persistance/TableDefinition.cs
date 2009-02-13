@@ -19,14 +19,16 @@ namespace SimpleStorageEngine.Persistance {
 
         public TableDefinition AddColumn(string columnName, Type type) 
         {
-            return AddColumn(columnName, type, false);
+            return AddColumn(columnName, type, ColumnProperties.None);
         }
 
-        public TableDefinition AddColumn(string columnName, Type type, bool isPrimaryKey) 
-        { 
-            AddColumn(new ColumnDefinition(columnName, type, isPrimaryKey)); 
+        public TableDefinition AddColumn(string columnName, Type type, ColumnProperties properties) 
+        {
+            AddColumn(new ColumnDefinition(columnName, type, properties)); 
             return this; 
         }
+
+
 
         public TableDefinition AddColumn(ColumnDefinition columnDefinition) 
         {
