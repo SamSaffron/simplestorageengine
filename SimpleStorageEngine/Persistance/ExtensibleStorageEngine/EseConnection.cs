@@ -50,10 +50,10 @@ namespace SimpleStorageEngine.Persistance.ExtensibleStorageEngine {
             base.Close();
         }
 
-       
-
         public override ITransaction BeginTransaction() {
-            throw new NotImplementedException();
+            var tran = new EseTransaction(this);
+            tran.BeginTransaction();
+            return tran;
         }
 
         public override bool InTransaction {

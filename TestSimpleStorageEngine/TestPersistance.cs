@@ -8,9 +8,7 @@ using System.IO;
 using System.Linq;
 
 namespace TestSimpleStorageEngine {
-    /// <summary>
-    /// Summary description for UnitTest1
-    /// </summary>
+
     [TestFixture]
     public class TestPersistance {
         public TestPersistance() {
@@ -204,6 +202,30 @@ namespace TestSimpleStorageEngine {
 
                 var rows = t.GetRows(new Row().SetValue("lastname", "ccc"));
                 Assert.AreEqual(50, Enumerable.Count(rows)); 
+            }
+        }
+
+        [Test]
+        public void TestTransaction() {
+            CreatePersonTable();
+            using (var connection = GetConnection()) {
+                var table = connection.GetTable("person");
+                
+                using (var transaction = connection.BeginTransaction()) {
+                    table.Insert(new Row()
+                        .SetValue("ssn", 1)
+                        .SetValue("name", "bob bob"));    
+                    transaction.Commit();
+                }
+                
+                using (var transaction = connection.BeginTransaction()) {
+                    table.Insert(new Row()
+                       .SetValue("ssn", 2)
+                       .SetValue("name", "bill bill"));
+                    transaction.Rollback();
+                }
+
+                Assert.AreEqual(1, table.Count);
             }
         }
 

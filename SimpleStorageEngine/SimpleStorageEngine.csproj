@@ -59,6 +59,7 @@
     <Compile Include="ActiveRecord\HasMany.cs" />
     <Compile Include="Persistance\Connection.cs" />
     <Compile Include="Persistance\ConnectionManager.cs" />
+    <Compile Include="Persistance\ExtensibleStorageEngine\EseTransaction.cs" />
     <Compile Include="Persistance\Index.cs" />
     <Compile Include="ActiveRecord\Attributes\IndexAttribute.cs" />
     <Compile Include="Persistance\IndexDefinition.cs" />
