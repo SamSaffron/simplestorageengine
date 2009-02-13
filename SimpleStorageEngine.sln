@@ -11,6 +11,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "nunit", "nunit", "{01B11D71
 		NUnit\nunit.framework.dll = NUnit\nunit.framework.dll
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "databases", "databases", "{330957C7-E0A3-4645-8797-893ED0E8F7DA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SqliteMergeModule", "SqliteMergeModule\SqliteMergeModule.csproj", "{15BB1D8E-4BA2-4EFF-9A1E-64F50F3648A7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestSqliteMergeModule", "TestSqliteMergeModule\TestSqliteMergeModule.csproj", "{4DA5A848-823A-408A-ACB5-286C628F5EE1}"
+EndProject
 Global
 	GlobalSection(TestCaseManagementSettings) = postSolution
 		CategoryFile = SimpleStorageEngine.vsmdi
@@ -28,6 +34,14 @@ Global
 		{3DFE40DA-8812-4D10-B035-EB88BC1E9255}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3DFE40DA-8812-4D10-B035-EB88BC1E9255}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3DFE40DA-8812-4D10-B035-EB88BC1E9255}.Release|Any CPU.Build.0 = Release|Any CPU
+		{15BB1D8E-4BA2-4EFF-9A1E-64F50F3648A7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{15BB1D8E-4BA2-4EFF-9A1E-64F50F3648A7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{15BB1D8E-4BA2-4EFF-9A1E-64F50F3648A7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{15BB1D8E-4BA2-4EFF-9A1E-64F50F3648A7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4DA5A848-823A-408A-ACB5-286C628F5EE1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4DA5A848-823A-408A-ACB5-286C628F5EE1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4DA5A848-823A-408A-ACB5-286C628F5EE1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4DA5A848-823A-408A-ACB5-286C628F5EE1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

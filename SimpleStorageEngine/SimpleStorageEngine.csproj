@@ -49,6 +49,7 @@
     <Compile Include="ActiveRecord\BelongsTo.cs" />
     <Compile Include="Persistance\ColumnDefinition.cs" />
     <Compile Include="ActiveRecord\Attributes\ColumnInfoAttribute.cs" />
+    <Compile Include="Persistance\ColumnProperties.cs" />
     <Compile Include="Persistance\ExtensibleStorageEngine\EseConnection.cs" />
     <Compile Include="Persistance\ExtensibleStorageEngine\EseConnectionManager.cs" />
     <Compile Include="Persistance\ExtensibleStorageEngine\EseException.cs" />

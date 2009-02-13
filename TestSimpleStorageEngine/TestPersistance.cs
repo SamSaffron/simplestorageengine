@@ -65,7 +65,7 @@ namespace TestSimpleStorageEngine {
         private void CreatePersonTable() {
             using (var connection = GetConnection()) {
                 connection.CreateTable(new TableDefinition("person")
-                    .AddColumn("ssn", typeof(int), true)
+                    .AddColumn("ssn", typeof(int), ColumnProperties.PrimaryKey)
                     .AddColumn("name", typeof(string))
                     );
             }
@@ -133,6 +133,25 @@ namespace TestSimpleStorageEngine {
                 t.Truncate();
                 Assert.AreEqual(0, t.Count);
             }
+        }
+
+        [Test]
+        public void TestAutoIncrement() {
+            using (var connection = GetConnection()) {
+                connection.CreateTable(new TableDefinition("person")
+                    .AddColumn("ssn", typeof(int), ColumnProperties.PrimaryKey | ColumnProperties.AutoIncrement)
+                    .AddColumn("name", typeof(string))
+                    );
+            }
+
+            using (var connection = GetConnection()) {
+
+                var t = connection.GetTable("person");
+            
+                
+            
+            }
+            
         }
 
         [Test]
